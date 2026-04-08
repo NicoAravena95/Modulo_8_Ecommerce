@@ -1,0 +1,80 @@
+{% extends 'store/base.html' %}
+{% block title %}Admin Productos — FrutaVerde Shop{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-gear-fill text-success"></i> Gestión de Productos</h2>
+    <a href="{% url 'admin_product_create' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Nuevo producto
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th class="text-center">Precio</th>
+                        <th class="text-center">Stock</th>
+                        <th class="text-center">Activo</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td class="text-muted small">{{ product.pk }}</td>
+                        <td>
+                            <strong>{{ product.name }}</strong>
+                            {% if product.description %}
+                            <br><small class="text-muted">{{ product.description|truncatechars:50 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-category-{{ product.category }}">
+                                {{ product.get_category_display }}
+                            </span>
+                        </td>
+                        <td class="text-center fw-bold">${{ product.price }}</td>
+                        <td class="text-center">
+                            {% if product.stock > 5 %}
+                            <span class="badge bg-success">{{ product.stock }}</span>
+                            {% elif product.stock > 0 %}
+                            <span class="badge bg-warning text-dark">{{ product.stock }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">0</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if product.active %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'admin_product_edit' product.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'admin_product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash3"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No hay productos registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
