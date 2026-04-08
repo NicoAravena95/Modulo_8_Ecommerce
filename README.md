@@ -3,7 +3,7 @@
 E-commerce de frutas y verduras desarrollado con Django + Bootstrap 5. Proyecto final del Módulo 8.
 
 # Github Repositorio 
-https://github.com/NicoAravena95/Modulo_8_Ecommerce
+https://github.com/NicoAravena95/Modulo_8_Ecommerce 
 
 ## Requisitos
 
@@ -109,3 +109,7 @@ SQLite (por defecto en Django). El archivo `db.sqlite3` se genera automáticamen
 
 - **Frutas:** Manzana Roja, Plátano, Naranja Valencia, Pera, Uva Red Globe, Frutilla
 - **Verduras:** Lechuga, Tomate, Zanahoria, Palta Hass, Brócoli, Espinaca
+
+
+## Autor 
+Nicolas Aravena Cruces - 2026
