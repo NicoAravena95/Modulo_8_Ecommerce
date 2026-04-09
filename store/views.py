@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -5,6 +7,12 @@ from django.contrib import messages
 
 from .models import Product, Cart, CartItem, Order, OrderItem
 from .forms import ProductForm, CartItemForm
+
+
+def _get_cart_count(user):
+    if hasattr(user, 'cart'):
+        return user.cart.get_item_count()
+    return 0
 
 
 # ─── Autenticación ────────────────────────────────────────────────────────────
@@ -41,13 +49,10 @@ def catalog(request):
     products = Product.objects.filter(active=True)
     if category in ['fruta', 'verdura']:
         products = products.filter(category=category)
-    cart_count = 0
-    if hasattr(request.user, 'cart'):
-        cart_count = request.user.cart.get_item_count()
     return render(request, 'store/catalog.html', {
         'products': products,
         'selected_category': category,
-        'cart_count': cart_count,
+        'cart_count': _get_cart_count(request.user),
     })
 
 
@@ -55,13 +60,10 @@ def catalog(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, active=True)
     form = CartItemForm()
-    cart_count = 0
-    if hasattr(request.user, 'cart'):
-        cart_count = request.user.cart.get_item_count()
     return render(request, 'store/product_detail.html', {
         'product': product,
         'form': form,
-        'cart_count': cart_count,
+        'cart_count': _get_cart_count(request.user),
     })
 
 
@@ -75,7 +77,10 @@ def _get_or_create_cart(user):
 @login_required
 def cart_view(request):
     cart = _get_or_create_cart(request.user)
-    return render(request, 'store/cart.html', {'cart': cart})
+    return render(request, 'store/cart.html', {
+        'cart': cart,
+        'cart_count': _get_cart_count(request.user),
+    })
 
 
 @login_required
@@ -140,7 +145,10 @@ def checkout_confirm(request):
     if not cart.items.exists():
         messages.error(request, "Tu carrito está vacío.")
         return redirect('cart')
-    return render(request, 'store/checkout_confirm.html', {'cart': cart})
+    return render(request, 'store/checkout_confirm.html', {
+        'cart': cart,
+        'cart_count': _get_cart_count(request.user),
+    })
 
 
 @login_required
@@ -177,12 +185,16 @@ def checkout_complete(request):
 @login_required
 def order_success(request, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
-    return render(request, 'store/order_success.html', {'order': order})
+    return render(request, 'store/order_success.html', {
+        'order': order,
+        'cart_count': _get_cart_count(request.user),
+    })
 
 
 # ─── Admin de productos ───────────────────────────────────────────────────────
 
 def admin_required(view_func):
+    @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')

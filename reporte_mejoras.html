@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe de Mejoras - FrutaVerde Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            line-height: 1.6;
+        }
+        h1 { font-size: 20px; margin-bottom: 4px; }
+        h2 { font-size: 15px; margin-top: 30px; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+        h3 { font-size: 14px; margin-top: 14px; margin-bottom: 4px; }
+        p { margin-bottom: 8px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 4px; }
+        code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 13px; }
+        .info { font-size: 12px; color: #666; margin-bottom: 24px; }
+        .bloque { border: 1px solid #ddd; padding: 12px 14px; margin-bottom: 12px; border-radius: 4px; }
+        @media print {
+            body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Informe de Mejoras — FrutaVerde Shop</h1>
+<p class="info">
+    Estudiante: Nicolás Aravena &nbsp;|&nbsp; Módulo 8 &nbsp;|&nbsp; Abril 2026
+</p>
+
+<h2>1. Descripción del proyecto</h2>
+<p>
+    FrutaVerde Shop es una tienda online hecha en Django donde los usuarios pueden ver un catálogo de frutas y verduras, agregar productos al carrito y hacer pedidos. También tiene un panel para que el admin pueda gestionar los productos (crear, editar, eliminar).
+</p>
+<p>Lo que tiene el sistema:</p>
+<ul>
+    <li>Login y logout</li>
+    <li>Catálogo con filtro por categoría (frutas / verduras)</li>
+    <li>Detalle de producto con control de stock</li>
+    <li>Carrito de compras por usuario</li>
+    <li>Checkout y generación de orden</li>
+    <li>Panel de admin para gestionar productos</li>
+</ul>
+
+<h2>2. Errores que encontré y cómo los corregí</h2>
+
+<div class="bloque">
+    <h3>El contador del carrito desaparecía en algunas páginas</h3>
+    <p>
+        El número de ítems que se muestra en el navbar (el badge del carrito) dejaba de aparecer cuando el usuario entraba al carrito, al checkout o a la pantalla de orden confirmada. Esto pasaba porque la variable <code>cart_count</code> solo se pasaba en dos vistas y en el resto no.
+    </p>
+    <p>
+        <strong>Lo que hice:</strong> Creé una función pequeña llamada <code>_get_cart_count(user)</code> y la usé en todas las vistas que necesitaban mostrar ese número.
+    </p>
+</div>
+
+<div class="bloque">
+    <h3>El decorador <code>admin_required</code> le faltaba <code>@wraps</code></h3>
+    <p>
+        Tenía un decorador propio para proteger las vistas del admin, pero le faltaba <code>@wraps(view_func)</code> de la librería <code>functools</code>. Sin eso, la función pierde su nombre original, lo que puede causar errores con Django internamente.
+    </p>
+    <p>
+        <strong>Lo que hice:</strong> Agregué el import de <code>functools</code> y puse <code>@wraps(view_func)</code> dentro del decorador.
+    </p>
+</div>
+
+<div class="bloque">
+    <h3>Los modelos no aparecían en el panel /admin de Django</h3>
+    <p>
+        El archivo <code>admin.py</code> estaba vacío, entonces al entrar al panel de administración de Django (<code>/admin/</code>) no se veía nada. Eso complica revisar los datos mientras se desarrolla.
+    </p>
+    <p>
+        <strong>Lo que hice:</strong> Registré todos los modelos (<code>Product</code>, <code>Order</code>, <code>Cart</code>, etc.) y le agregué filtros y búsqueda a los más importantes.
+    </p>
+</div>
+
+<h2>3. Mejoras que implementé</h2>
+
+<div class="bloque">
+    <h3>Indicador visual de "Sin stock" en el catálogo</h3>
+    <p>
+        Antes, los productos sin stock se veían igual que los disponibles. El usuario no sabía que estaban agotados hasta que entraba al detalle del producto, lo cual es un poco frustrante.
+    </p>
+    <p><strong>Lo que hice:</strong></p>
+    <ul>
+        <li>Agregué un badge rojo "Sin stock" sobre la imagen del producto</li>
+        <li>La tarjeta aparece con un poco más de transparencia para que se note que no está disponible</li>
+        <li>El botón "Ver detalle" se reemplaza por uno desactivado que dice "Sin stock"</li>
+    </ul>
+</div>
+
+<h2>4. Feedback aplicado</h2>
+
+<div class="bloque">
+    <h3>Consistencia del carrito en toda la navegación</h3>
+    <p>
+        El feedback fue que la experiencia del carrito era confusa porque el contador desaparecía al navegar. Ya estaba corregido en la sección de errores, pero vale mencionarlo acá también porque es algo que afecta directamente la experiencia del usuario.
+    </p>
+</div>
+
+<div class="bloque">
+    <h3>Mostrar claramente los productos sin stock</h3>
+    <p>
+        Se sugirió que el catálogo debería dejar en claro cuáles productos no se pueden comprar antes de entrar al detalle. Lo resolví con los cambios visuales mencionados arriba.
+    </p>
+</div>
+
+<h2>5. Archivos que modifiqué</h2>
+<ul>
+    <li><code>store/views.py</code> — corrección del badge del carrito, función auxiliar, y decorador con @wraps</li>
+    <li><code>store/admin.py</code> — registro de modelos en el panel Django admin</li>
+    <li><code>store/templates/store/catalog.html</code> — mejora visual para productos sin stock</li>
+</ul>
+
+</body>
+</html>
